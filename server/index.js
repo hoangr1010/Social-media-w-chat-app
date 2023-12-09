@@ -86,16 +86,18 @@ const io = new Server(server, {
 })
 
 io.on('connection', (socket) => {
-    console.log('socket connected');
-
     socket.on('chatSetup', (chatIdList) => {
         socket.join(chatIdList);
-        socket.emit('chatSetup', "successfully set up chat socket")
+        socket.emit('chatSetup',"Successfully set up chat")
     })
 
     socket.on('newMessage', (messageObject) => {
-        console.log(socket.rooms)
-        console.log(messageObject.chatId)
-        socket.to(messageObject.chatId).emit(messageObject);
+        // Check if the socket is in the specified room
+        if (socket.rooms.has(messageObject.chatId)) {
+        // Emit the 'newMessage' event to the specified room
+            io.in(messageObject.chatId).emit("newMessage", messageObject);
+        } else {
+            console.log(`Socket ${socket.id} is not in the room ${messageObject.chatId}`);
+        }
     })
 })

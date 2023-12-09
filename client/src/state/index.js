@@ -74,10 +74,10 @@ const chatSlice = createSlice({
         },
         updateChat(state, action) {
             const { chatId } = action.payload;
-
+            
             const updatedChatList = state.chats.map(chat => {
                 if (chat.chatId == chatId) {
-                    
+
                     if (action.payload.lastMessage) {
                         chat.lastMessage = action.payload.lastMessage
                     }

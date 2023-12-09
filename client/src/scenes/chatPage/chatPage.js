@@ -13,20 +13,25 @@ import CallIcon from '@mui/icons-material/Call';
 import SendIcon from '@mui/icons-material/Send';
 
 function ChatPage() {
+    
     const { chatId } = useParams();
+    
     const assetUrl = process.env.REACT_APP_STATIC_ASSETS_URL;
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     let currChat, otherPicture, name;
+    
+    const [messageText, setMessageText] = useState('');
+    const messageBoxRef = useRef(null);
+    const currChatIdRef = useRef();
 
     const token = useSelector((state) => state.authReducer.token);
     const chatList = useSelector((state) => state.chatReducer.chats)
     const chatIdList = chatList.map((chat) => chat.chatId);
-    const currChatId = useSelector((state) => state.chatReducer.currChatId);
     const messages = useSelector((state) => state.chatReducer.currMessage)
-    const loginUserId = useSelector((state) => state.authReducer.user._id)
+    const loginUserId = useSelector((state) => state.authReducer.user._id);
+    const currChatId = useSelector((state) => state.chatReducer.currChatId);
     const dispatch = useDispatch();
-    const [messageText, setMessageText] = useState('');
-    const messageBoxRef = useRef(null);
+
     
     if (chatId != 'null') {
         currChat = chatList.find(chat => chat.chatId==chatId);
@@ -41,6 +46,9 @@ function ChatPage() {
     
     // fetch Message of the ChatId
     useEffect(() => {
+
+        currChatIdRef.current = chatId;
+
         if (chatId != 'null') {
             dispatch(setCurrChatId(chatId));
 
@@ -83,11 +91,13 @@ function ChatPage() {
             socket.off('chatSetup');
         }
     },[])
+
     useEffect(() => {
         socket.on('newMessage', (messageObject) => {
             const chatId = messageObject.chatId;
             const message = messageObject.message;
-            console.log(messageObject)
+
+            // Update the lastest message
             dispatch(updateChat({
                 chatId,
                 lastMessage: {
@@ -95,15 +105,17 @@ function ChatPage() {
                     sender: message.sender._id,
                 }
             }))
-
-            if (chatId == currChatId) {
+            
+            // Update the list of message
+            if (chatId == currChatIdRef.current) {
                 dispatch(updateMessage(message))
             }
         
+        })
+
         return () => {
             socket.off('newMessage');
         }
-        })
     },[])
 
     // CONTROLLERS
@@ -122,7 +134,6 @@ function ChatPage() {
         })
             .then(response => response.json())
             .then((data) => {
-                console.log(data);
                 setMessageText('');
                 const newMessage = data.newMessage;
 
@@ -135,22 +146,6 @@ function ChatPage() {
                         sender: newMessage.sender
                     }
                 });
-                
-                // const newChat = {
-                //     ...currChat,
-                //     lastMessage: data.updatedChat.lastMessage,
-                // }
-                
-                // // update new lastMessage in Chat
-                // dispatch(updateChat({ 
-                //     chatId: newChat.chatId,
-                //     newChat: newChat
-                // }))
-
-                // dispatch(updateMessage({
-                //     ...newChat.lastMessage,
-                //     sender: data.newMessage.sender
-                // }))
                 
             })
             .catch(err => console.log(err));
