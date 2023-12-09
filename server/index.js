@@ -100,4 +100,8 @@ io.on('connection', (socket) => {
             console.log(`Socket ${socket.id} is not in the room ${messageObject.chatId}`);
         }
     })
+
+    socket.on('typing', (chatId) => {
+        socket.in(chatId).emit('typing'); 
+    })
 })

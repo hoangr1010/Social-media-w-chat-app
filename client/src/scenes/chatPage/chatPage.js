@@ -8,6 +8,7 @@ import { updateChat, updateMessage } from 'state';
 import { socket } from 'socket';
 import { Box, Typography, Avatar, IconButton, InputBase, TextField } from '@mui/material';
 import FlexBetween from 'components/Flexbetween';
+import Typing from 'components/Typing';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import CallIcon from '@mui/icons-material/Call';
 import SendIcon from '@mui/icons-material/Send';
@@ -22,6 +23,7 @@ function ChatPage() {
     
     const [messageText, setMessageText] = useState('');
     const messageBoxRef = useRef(null);
+    const [isTyping, setIsTyping] = useState(false);
     const currChatIdRef = useRef();
 
     const token = useSelector((state) => state.authReducer.token);
@@ -29,7 +31,6 @@ function ChatPage() {
     const chatIdList = chatList.map((chat) => chat.chatId);
     const messages = useSelector((state) => state.chatReducer.currMessage)
     const loginUserId = useSelector((state) => state.authReducer.user._id);
-    const currChatId = useSelector((state) => state.chatReducer.currChatId);
     const dispatch = useDispatch();
 
     
@@ -80,8 +81,9 @@ function ChatPage() {
     }, [messages])
 
     // SOCKET SETTINGS
+
+    // set up socket connection to rooms (chatId)
     useEffect(() => {
-        // set up socket connection to rooms (chatId)
         socket.emit('chatSetup', chatIdList);
         socket.on('chatSetup', (message) => {
             console.log(message);
@@ -92,6 +94,7 @@ function ChatPage() {
         }
     },[])
 
+    // Handle new mewssage received
     useEffect(() => {
         socket.on('newMessage', (messageObject) => {
             const chatId = messageObject.chatId;
@@ -117,6 +120,27 @@ function ChatPage() {
             socket.off('newMessage');
         }
     },[])
+
+    // Handle tying 
+    useEffect(() => {
+        let typingTimeout;
+
+        const handleTyping = () => {
+            setIsTyping(true);
+
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                setIsTyping(false);
+            }, 1000);
+        }
+
+        socket.on('typing', handleTyping);
+
+        return () => {
+            socket.off('typing');
+            clearTimeout(typingTimeout);
+        }
+    }, [])
 
     // CONTROLLERS
     const sendMessage = (e) => {
@@ -159,6 +183,8 @@ function ChatPage() {
                 sendMessage();
             }
         }
+
+        socket.emit('typing', currChatIdRef.current);
     }
 
     // In case there is no particular current chat box, show empty chatbox
@@ -256,6 +282,13 @@ function ChatPage() {
                             ))
                         }
                     </Box>
+                    
+                    {/* Typing Indicator */}
+                    {
+                        isTyping && (
+                            <Typing name={name}/>
+                        )
+                    }
                     
                     {/* Message input */}
                     <FlexBetween
