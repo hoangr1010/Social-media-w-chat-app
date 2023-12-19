@@ -3,7 +3,7 @@ import FlexBetween from "components/Flexbetween.js";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useTheme } from '@mui/material/styles';
-import { setMode, setLogout } from 'state'
+import { setMode, setLogoutAuth, setLogoutProfile, setLogoutChat } from 'state';
 import { Box, Typography, IconButton, InputBase, Menu, MenuItem, Avatar, useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -52,6 +52,15 @@ function Navbar() {
 
     function handleClose() {
       setAnchorEl(null);
+    }
+
+    // CONTROLLERS
+    const logout = () => {
+      dispatch(setLogoutAuth());
+      dispatch(setLogoutProfile());
+      dispatch(setLogoutChat());
+      navigate('/');
+      handleClose();
     }
 
     return (
@@ -132,7 +141,7 @@ function Navbar() {
                 <MenuItem onClick={handleClose}>
                   <Typography onClick={() => navigate('/profile/'+user._id)} color={mode==='dark' ? textContrastColor : textColor}>{firstName} {lastName}</Typography>
                 </MenuItem>
-                <MenuItem onClick={() => {dispatch(setLogout());dispatch(setMode());handleClose()}}>
+                <MenuItem onClick={logout}>
                   <Typography color={mode==='dark' ? textContrastColor : textColor}>Logout</Typography>
                 </MenuItem>
               </Menu>
@@ -187,7 +196,7 @@ function Navbar() {
                   <MenuItem onClick={handleClose}>
                     <Typography onClick={() => navigate('/profile/'+user._id)} color={mode==='dark' ? textContrastColor : textColor}>{firstName} {lastName}</Typography>
                   </MenuItem>
-                  <MenuItem onClick={() => {dispatch(setLogout());dispatch(setMode());handleClose()}}>
+                  <MenuItem onClick={logout}>
                     <Typography color={mode==='dark' ? textContrastColor : textColor}>Logout</Typography>
                   </MenuItem>
                 </Menu>

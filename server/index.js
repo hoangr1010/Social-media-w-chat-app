@@ -86,11 +86,13 @@ const io = new Server(server, {
 })
 
 io.on('connection', (socket) => {
+    // Set up: connect socket to all chat room
     socket.on('chatSetup', (chatIdList) => {
         socket.join(chatIdList);
         socket.emit('chatSetup',"Successfully set up chat")
     })
 
+    // handle messaging
     socket.on('newMessage', (messageObject) => {
         // Check if the socket is in the specified room
         if (socket.rooms.has(messageObject.chatId)) {
@@ -101,7 +103,14 @@ io.on('connection', (socket) => {
         }
     })
 
+    // Handle typing events
     socket.on('typing', (chatId) => {
         socket.in(chatId).emit('typing'); 
+    })
+
+    socket.on('heartBeat', (chatIdList) => {
+        chatIdList.forEach(chatId => {
+            socket.in(chatId).emit('heartBeat', chatId);
+        })
     })
 })

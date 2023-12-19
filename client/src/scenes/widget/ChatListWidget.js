@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import FlexBetween from 'components/Flexbetween';
 import { Box, Typography, IconButton, InputBase, Avatar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import AvatarStatus from 'components/AvatarStatus';
 import SearchIcon from '@mui/icons-material/Search';
 
 function ChatList() {
@@ -56,10 +57,11 @@ function ChatList() {
                             my: '5px'
                         }}
                     >
-                        <Avatar 
-                            alt={chat.other.firstName + chat.other.lastName}
-                            src={`${assetUrl}/${chat.other.picturePath}`}
-                            sx={{ width: 50, height: 50 }}
+                        <AvatarStatus 
+                                    name={chat.other.firstName + chat.other.lastName}
+                                    picturePath={chat.other.picturePath}
+                                    size={50}
+                                    status={chat.status}
                         />
 
                         <Box flexGrow='1'>

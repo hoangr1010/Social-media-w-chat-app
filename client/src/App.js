@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useMemo } from "react";
 import { socket } from './socket'
+import { updateChat } from 'state';
 import HomePage from "scenes/homePage";
 import LoginPage from "scenes/loginPage";
 import ChatPage from "scenes/chatPage/chatPage";
@@ -14,19 +15,71 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 function App() {
+
   const mode = useSelector((state) => state.authReducer.mode);
-  const isUser = useSelector((state) => state.authReducer.user)
+  const isUser = useSelector((state) => state.authReducer.user);
+  const isUserRef = useRef(isUser);
+  const chatList = useSelector((state) => state.chatReducer.chats);
+  const chatIdList = chatList.map((chat) => chat.chatId);
+  const dispatch = useDispatch();
   const theme = useMemo(() => createTheme(themeSettings(mode)),[mode]);
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('socket connected');
-    })
+    isUserRef.current = isUser;
+  }, [isUser])
+
+  // Handle connection and sending heartBeat
+  useEffect(() => {
+    let heartBeatInterval;
+    
+    if (isUserRef.current) {
+      socket.on('connect', () => {
+        console.log('socket connected');
+
+        heartBeatInterval = setInterval(() => {
+          if (isUserRef.current) {
+            socket.emit('heartBeat', chatIdList);
+          }
+        }, 5000);
+      })
+    } else {      
+      clearInterval(heartBeatInterval);
+      socket.off('connect');
+    }
 
     return () => {
-      socket.off('connect')
-    };
-  },[])
+      socket.off('connect');
+      clearInterval(heartBeatInterval);
+    }
+  },[isUser])
+
+  // Handle receiving heartbeat
+  useEffect(() => {
+    let statusTimeout;
+
+    const handleStatus = (chatId) => {
+      console.log(chatId);
+
+      dispatch(updateChat({chatId: chatId, status: 'online'}));
+
+      clearTimeout(statusTimeout);
+      statusTimeout = setTimeout(() => {
+        dispatch(updateChat({chatId: chatId, status: 'offline'}));
+      }, 6000);
+    }
+
+    if (isUserRef.current) {
+      socket.on('heartBeat', handleStatus);
+    } else {
+      socket.off('heartBeat');
+      clearTimeout(statusTimeout);
+    }
+
+    return () => {
+      socket.off('heartBeat', handleStatus);
+      clearTimeout(statusTimeout);
+    }
+  },[isUser])
 
   return (
     <BrowserRouter>

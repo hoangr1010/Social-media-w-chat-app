@@ -28,9 +28,11 @@ const authSlice = createSlice({
             state.user = action.payload.user;
             state.token = action.payload.token;
         },
-        setLogout(state) {
+        setLogoutAuth(state) {
+            state.mode = "light";
             state.user = null;
             state.token = null;
+            state.posts = []        
         },
         setFriends(state,action) {
             if (state.user) {
@@ -61,6 +63,9 @@ const profileSlice = createSlice({
     reducers: {
         setProfileFriends(state,action) {
             state.friends = action.payload;
+        },
+        setLogoutProfile(state) {
+            state.friends = [];
         }
     }
 })
@@ -82,6 +87,10 @@ const chatSlice = createSlice({
                         chat.lastMessage = action.payload.lastMessage
                     }
 
+                    if (action.payload.status) {
+                        chat.status = action.payload.status;
+                    }
+
                 };
                 return chat
             })
@@ -96,14 +105,19 @@ const chatSlice = createSlice({
         },
         setCurrChatId(state, action) {
             state.currChatId = action.payload;
+        },
+        setLogoutChat(state) {
+            state.chats = [];
+            state.currChatId = null;
+            state.currMessage = [];
         }
     }
 })
 
 
-export const { setMode, setLogin, setLogout, setFriends, setPosts, updatePost} = authSlice.actions;
-export const { setProfileFriends } = profileSlice.actions;
-export const { setChat, updateChat, setMessage, updateMessage, setCurrChatId } = chatSlice.actions;
+export const { setMode, setLogin, setLogoutAuth, setFriends, setPosts, updatePost} = authSlice.actions;
+export const { setProfileFriends, setLogoutProfile } = profileSlice.actions;
+export const { setChat, updateChat, setMessage, updateMessage, setCurrChatId, setLogoutChat } = chatSlice.actions;
 export default {
     authReducer: authSlice.reducer,
     profileReducer: profileSlice.reducer,

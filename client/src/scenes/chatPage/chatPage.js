@@ -9,6 +9,7 @@ import { socket } from 'socket';
 import { Box, Typography, Avatar, IconButton, InputBase, TextField } from '@mui/material';
 import FlexBetween from 'components/Flexbetween';
 import Typing from 'components/Typing';
+import AvatarStatus from 'components/AvatarStatus';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import CallIcon from '@mui/icons-material/Call';
 import SendIcon from '@mui/icons-material/Send';
@@ -19,7 +20,7 @@ function ChatPage() {
     
     const assetUrl = process.env.REACT_APP_STATIC_ASSETS_URL;
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
-    let currChat, otherPicture, name;
+    let currChat, otherPicture, name, status;
     
     const [messageText, setMessageText] = useState('');
     const messageBoxRef = useRef(null);
@@ -38,6 +39,7 @@ function ChatPage() {
         currChat = chatList.find(chat => chat.chatId==chatId);
         otherPicture = currChat.other.picturePath;
         name = currChat.other.firstName + ' ' + currChat.other.lastName;
+        status = currChat.status;
     }
     
     // THEME SETTINGS
@@ -216,10 +218,11 @@ function ChatPage() {
                     <FlexBetween padding='15px 5px'>
 
                         <FlexBetween gap='10px'>
-                            <Avatar 
-                                    alt={name}
-                                    src={`${assetUrl}/${otherPicture}`}
-                                    sx={{ width: 50, height: 50 }}
+                            <AvatarStatus 
+                                    name={name}
+                                    picturePath={otherPicture}
+                                    size={50}
+                                    status={status}
                             />
 
                             <Box flexGrow='1'>

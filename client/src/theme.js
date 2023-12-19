@@ -1,4 +1,4 @@
-import { cyan, grey, red } from '@mui/material/colors';
+import { cyan, grey, red, lightGreen } from '@mui/material/colors';
 
 export default function themeSettings (mode) {
     return {
@@ -28,6 +28,9 @@ export default function themeSettings (mode) {
             background: {
                 default: grey[900],
                 alt: grey[800]
+            },
+            message: {
+                main: lightGreen['A400']
             }
         } : {
             // set up for light themes
@@ -56,6 +59,9 @@ export default function themeSettings (mode) {
                 default: grey[200],
                 alt: grey[100],
             },
+            message: {
+                main: lightGreen['A400']
+            }
         },
         typography: {
             fontFamily: 'Rubik',
