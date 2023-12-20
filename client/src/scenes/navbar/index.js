@@ -9,8 +9,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import MessageIcon from '@mui/icons-material/Message';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
 import ClearIcon from '@mui/icons-material/Clear';
 
@@ -123,12 +121,6 @@ function Navbar() {
               <IconButton onClick={() => {navigate('/chat/null');navigate(0)}}>
                 <MessageIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
               </IconButton>
-              <IconButton>
-                <NotificationsIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
-              </IconButton>
-              <IconButton>
-                <HelpIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
-              </IconButton>
               
               <IconButton>
                 <Avatar src={`${assetUrl}/${user.picturePath}`} sx={{ color: textColor, backgroundColor: neutralLight }} onClick={handleClick}/>
@@ -177,12 +169,6 @@ function Navbar() {
                 </IconButton>
                 <IconButton onClick={() => {navigate('/chat/null');navigate(0)}}>
                   <MessageIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
-                </IconButton>
-                <IconButton>
-                  <NotificationsIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
-                </IconButton>
-                <IconButton>
-                  <HelpIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
                 </IconButton>
                 
                 <IconButton>

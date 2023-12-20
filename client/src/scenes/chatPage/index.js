@@ -18,7 +18,6 @@ function ChatPage() {
     
     const { chatId } = useParams();
     
-    const assetUrl = process.env.REACT_APP_STATIC_ASSETS_URL;
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     let currChat, otherPicture, name, status;
     
@@ -26,6 +25,7 @@ function ChatPage() {
     const messageBoxRef = useRef(null);
     const [isTyping, setIsTyping] = useState(false);
     const currChatIdRef = useRef();
+    const messageInputRef = useRef(null);
 
     const token = useSelector((state) => state.authReducer.token);
     const chatList = useSelector((state) => state.chatReducer.chats)
@@ -51,6 +51,10 @@ function ChatPage() {
     useEffect(() => {
 
         currChatIdRef.current = chatId;
+
+        if (messageInputRef.current) {
+            messageInputRef.current.focus();
+        }
 
         if (chatId != 'null') {
             dispatch(setCurrChatId(chatId));
@@ -84,18 +88,6 @@ function ChatPage() {
 
     // SOCKET SETTINGS
 
-    // set up socket connection to rooms (chatId)
-    useEffect(() => {
-        socket.emit('chatSetup', chatIdList);
-        socket.on('chatSetup', (message) => {
-            console.log(message);
-        })
-
-        return () => {
-            socket.off('chatSetup');
-        }
-    },[])
-
     // Handle new mewssage received
     useEffect(() => {
         socket.on('newMessage', (messageObject) => {
@@ -108,12 +100,15 @@ function ChatPage() {
                 lastMessage: {
                     ...message,
                     sender: message.sender._id,
-                }
+                },
+                newMessage: loginUserId == message.sender._id ? null : 'increase',
             }))
+
+            updateNewMessage(chatId, message.sender._id, 'increase')
             
             // Update the list of message
             if (chatId == currChatIdRef.current) {
-                dispatch(updateMessage(message))
+                dispatch(updateMessage(message));
             }
         
         })
@@ -127,13 +122,16 @@ function ChatPage() {
     useEffect(() => {
         let typingTimeout;
 
-        const handleTyping = () => {
-            setIsTyping(true);
+        const handleTyping = (chatId) => {
+            if (currChatIdRef.current == chatId) {
+                setIsTyping(true);
 
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
-                setIsTyping(false);
-            }, 1000);
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    setIsTyping(false);
+                }, 1000);
+            }
+
         }
 
         socket.on('typing', handleTyping);
@@ -175,7 +173,21 @@ function ChatPage() {
                 
             })
             .catch(err => console.log(err));
+    }
 
+    const updateNewMessage = (chatId, userId, action) => {
+        fetch(`${backendUrl}/chat/newMessage/${chatId}/${userId}/${action}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": "Bearer " + token
+            }
+        })
+            .then(response => response.json())
+            .then((data) => {
+                console.log(data);
+            })
+            .catch((err) => console.log(err))
     }
 
     const handleKeyDown = (e) => {
@@ -187,6 +199,19 @@ function ChatPage() {
         }
 
         socket.emit('typing', currChatIdRef.current);
+    }
+
+    const handleFocus = () => {
+
+        if (currChat.newMessage != 0) {
+            updateNewMessage(chatId, loginUserId, 'reset');
+        }
+
+        dispatch(updateChat({
+            chatId,
+            newMessage: 'reset'
+        }))
+
     }
 
     // In case there is no particular current chat box, show empty chatbox
@@ -312,6 +337,9 @@ function ChatPage() {
                                 overflow: 'auto'
                             }}>
                             <InputBase 
+                                autoFocus
+                                onFocus={handleFocus}
+                                inputRef={messageInputRef}
                                 value={messageText}
                                 onChange={(e) => setMessageText(e.target.value)}
                                 onKeyDown={handleKeyDown}

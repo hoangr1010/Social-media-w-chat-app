@@ -91,6 +91,16 @@ const chatSlice = createSlice({
                         chat.status = action.payload.status;
                     }
 
+                    if (action.payload.newMessage) {
+                        switch (action.payload.newMessage) {
+                            case 'increase':
+                                chat.newMessage += 1;
+                                break;
+                            case 'reset':
+                                chat.newMessage = 0;
+                                break;
+                        }
+                    }
                 };
                 return chat
             })

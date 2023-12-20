@@ -105,9 +105,10 @@ io.on('connection', (socket) => {
 
     // Handle typing events
     socket.on('typing', (chatId) => {
-        socket.in(chatId).emit('typing'); 
+        socket.in(chatId).emit('typing', chatId); 
     })
 
+    // Handle heart beat
     socket.on('heartBeat', (chatIdList) => {
         chatIdList.forEach(chatId => {
             socket.in(chatId).emit('heartBeat', chatId);

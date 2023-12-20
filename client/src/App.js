@@ -6,7 +6,7 @@ import { socket } from './socket'
 import { updateChat } from 'state';
 import HomePage from "scenes/homePage";
 import LoginPage from "scenes/loginPage";
-import ChatPage from "scenes/chatPage/chatPage";
+import ChatPage from "scenes/chatPage";
 import Navbar from "scenes/navbar";
 import LoginNavBar from "scenes/navbar/LoginNavBar.js";
 import ProfilePage from "scenes/profilePage";
@@ -30,6 +30,8 @@ function App() {
 
   // Handle connection and sending heartBeat
   useEffect(() => {
+
+    // Connect socket and send heart beat
     let heartBeatInterval;
     
     if (isUserRef.current) {
@@ -47,8 +49,15 @@ function App() {
       socket.off('connect');
     }
 
+    // set up socket connection to rooms (chatId)
+    socket.emit('chatSetup', chatIdList);
+    socket.on('chatSetup', (message) => {
+        console.log(message);
+    })
+
     return () => {
       socket.off('connect');
+      socket.off('chatSetup');
       clearInterval(heartBeatInterval);
     }
   },[isUser])

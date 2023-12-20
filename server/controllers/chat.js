@@ -141,3 +141,37 @@ export const createChat = async (req, res) => {
 
 };
 
+export const updateNewMessage = async (req, res) => {
+    try {
+        const { chatId, userId, action } = req.params;
+
+        // fetch chatId
+        const chat = await Chat.findById(chatId)
+
+        if (!chat) {
+            throw new Error('No chat found');
+        }
+
+        // Update users
+        const updatedUser = chat.users.map(user => {
+            if (userId == user.userId) {
+                if (action == 'increase') {
+                    user.newMessage += 1;
+                } else if (action == 'reset') {
+                    user.newMessage = 0;
+                }
+            }
+            return user;
+        })
+
+        const updatedChat = await Chat.findOneAndUpdate(
+            { _id: chatId },
+            { $set: { users: updatedUser }},
+            { new: true },
+        )
+
+        res.status(200).send({ updatedChat });
+    } catch (err) {
+        res.status(400).send({message: err.message});
+    }
+};

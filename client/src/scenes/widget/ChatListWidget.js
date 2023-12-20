@@ -1,14 +1,13 @@
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from "react-redux";
 import FlexBetween from 'components/Flexbetween';
-import { Box, Typography, IconButton, InputBase, Avatar } from '@mui/material';
+import { Box, Typography, IconButton, InputBase, Badge } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import AvatarStatus from 'components/AvatarStatus';
 import SearchIcon from '@mui/icons-material/Search';
 
 function ChatList() {
 
-    const assetUrl = process.env.REACT_APP_STATIC_ASSETS_URL;
     const chatList = useSelector((state) => state.chatReducer.chats);
     const loginUserId = useSelector((state) => state.authReducer.user._id)
     const navigate = useNavigate();
@@ -16,6 +15,7 @@ function ChatList() {
     // THEME SETTINGS
     const theme = useTheme();
     const neutralLight = theme.palette.neutral.light;
+    const lightPrimary = theme.palette.primary.light;
     const alt = theme.palette.background.alt;
 
     return (
@@ -48,6 +48,7 @@ function ChatList() {
                         onClick={() => navigate(`/chat/${chat.chatId}`)}
                         padding='10px 10px'
                         gap='15px'
+                        backgroundColor={chat.newMessage ? lightPrimary : null}
                         sx={{
                             "&:hover": {
                                 backgroundColor: alt,
@@ -76,11 +77,19 @@ function ChatList() {
                                 }
                             </Typography>
                         </Box>
+                        <Badge 
+                            badgeContent={chat.newMessage} 
+                            color="secondary" 
+                            max={9} 
+                            sx={{
+                                margin: '10px',
+                            }}
+                        />
 
 
                     </FlexBetween>
                 ))}
-                
+
             </Box>
 
         </Box>
