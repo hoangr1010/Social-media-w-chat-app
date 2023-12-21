@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import FlexBetween from "components/Flexbetween.js";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useTheme } from '@mui/material/styles';
 import { setMode, setLogoutAuth, setLogoutProfile, setLogoutChat } from 'state';
-import { Box, Typography, IconButton, InputBase, Menu, MenuItem, Avatar, useMediaQuery } from '@mui/material';
+import { Box, Typography, IconButton, InputBase, Menu, MenuItem, Avatar, Badge, useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -16,13 +16,15 @@ function Navbar() {
     const state = useSelector((state) => state.authReducer);
     const mode = state.mode;
     const user = state.user;
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
     const assetUrl = process.env.REACT_APP_STATIC_ASSETS_URL;
     const firstName = state.user.firstName;
     const lastName = state.user.lastName;
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const chatList = useSelector(state => state.chatReducer.chats);
+    let newMessageAmtRef = useRef();
+    
     const theme = useTheme();
     // const neutralDark = theme.palette.neutral.dark;
     // const background = theme.palette.background.default;
@@ -31,15 +33,20 @@ function Navbar() {
     const textColor = theme.palette.text.primary;
     const textContrastColor= theme.palette.text.contrast;
     const alt = theme.palette.background.alt;
-
+    
     // screen size adaptivity settings
     const isNonMobileScreen = useMediaQuery('(min-width:960px)');
     const isSmallScreen = useMediaQuery('(max-width:650px)');
     const [isMobileToggle,setIsMobileToggle] = useState(false);
-
-    // Profile dropdown settings
     const [anchorEl,setAnchorEl] = useState(null);
-
+    
+    useEffect(() => {   
+      newMessageAmtRef.current = chatList.reduce((acc, chat) => {
+        return acc + chat.newMessage;
+      }, 0)
+    }, [chatList])
+    
+    // CONTROLLERS
     function handleClick(e) {
       if (anchorEl) {
         setAnchorEl(null);
@@ -52,7 +59,6 @@ function Navbar() {
       setAnchorEl(null);
     }
 
-    // CONTROLLERS
     const logout = () => {
       dispatch(setLogoutAuth());
       dispatch(setLogoutProfile());
@@ -118,9 +124,20 @@ function Navbar() {
                 )
                 }
               </IconButton>
-              <IconButton onClick={() => {navigate('/chat/null');navigate(0)}}>
-                <MessageIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
-              </IconButton>
+              <Badge 
+                  badgeContent={newMessageAmtRef.current} 
+                  color="secondary" 
+                  overlap="circular"
+                  sx={{
+                '& .MuiBadge-badge': {
+                    border: `2px solid ${alt}`,
+                    padding: '0 4px',
+            }}}
+              >
+                <IconButton onClick={() => {navigate('/chat/null');navigate(0)}}>
+                  <MessageIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
+                </IconButton>
+              </Badge>
               
               <IconButton>
                 <Avatar src={`${assetUrl}/${user.picturePath}`} sx={{ color: textColor, backgroundColor: neutralLight }} onClick={handleClick}/>
@@ -167,9 +184,22 @@ function Navbar() {
                   )
                   }
                 </IconButton>
-                <IconButton onClick={() => {navigate('/chat/null');navigate(0)}}>
-                  <MessageIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
-                </IconButton>
+                <Badge 
+                      badgeContent={newMessageAmtRef.current} 
+                      color="secondary" 
+                      overlap="circular"
+                      sx={{
+                    '& .MuiBadge-badge': {
+                        border: `2px solid ${neutralLight}`,
+                        padding: '0 4px',
+                }}}
+                >
+
+                  <IconButton onClick={() => {navigate('/chat/null');navigate(0)}}>
+                    <MessageIcon sx={{ color: textColor, fontSize: "1.4rem" }} />
+                  </IconButton>
+                </Badge>
+
                 
                 <IconButton>
                   <Avatar src={`${assetUrl}/${user.picturePath}`} sx={{ color: textColor, backgroundColor: neutralLight }} onClick={handleClick}/>

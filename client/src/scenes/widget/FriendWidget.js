@@ -3,10 +3,11 @@ import { Box, Typography, Avatar, CircularProgress, IconButton } from '@mui/mate
 import { useNavigate } from "react-router-dom";
 import { useTheme } from '@mui/material/styles';
 import { useSelector, useDispatch } from "react-redux";
-import { setFriends } from 'state';
+import { setFriends, setChat } from 'state';
 import FlexBetween from 'components/Flexbetween.js';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import PersonRemoveOutlinedIcon from '@mui/icons-material/PersonRemoveOutlined';
+import AddCommentIcon from '@mui/icons-material/AddComment';
 
 function FriendWidget({ userId }) {
     
@@ -20,6 +21,8 @@ function FriendWidget({ userId }) {
     const friends = useSelector((state) => state.authReducer.user.friends);
     const loginUserId = useSelector((state) => state.authReducer.user._id);
     const isFriend = user && friends.includes(user._id);
+    const chatList = useSelector((state) => state.chatReducer.chats)
+    const otherIdChatlist = chatList.map(chat => chat.other._id);
 
     useEffect(() => {
         fetch(`${backendUrl}/user/${userId}`, {
@@ -56,6 +59,56 @@ function FriendWidget({ userId }) {
         
     }
 
+    const handleNavigateChat = async () => {
+        let chatId;
+
+        // Check userId in ChatList
+        if (!otherIdChatlist.includes(userId)) {
+            chatId = await createChat();
+            await updateChatList();
+            console.log(chatId);
+        } else {
+            const chat = chatList.find(chat => chat.other._id == userId);
+            chatId = chat.chatId;
+        }
+        console.log(chatId);
+        //Navigate to the Chat
+        console.log('navigate here')
+        navigate(`/chat/${chatId}`);
+        // navigate(0);
+    }
+
+    const createChat = async () => {
+        const participants = [userId, loginUserId]
+
+        const res = await fetch(`${backendUrl}/chat`, {
+            method: 'POST',
+            body: JSON.stringify({participants: participants}),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            }
+        })
+        
+        const data = await res.json();
+        console.log(data);
+        return data.newChat._id;
+    }
+
+    const updateChatList = async () => {
+        await fetch(`${backendUrl}/chat/${loginUserId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            }})
+            .then(response => response.json())
+            .then((data) => {
+              dispatch(setChat(data.chats))
+            })
+            .catch((err) => console.log(err))
+      
+    }
 
     if (!user) {
         return <CircularProgress />
@@ -87,17 +140,24 @@ function FriendWidget({ userId }) {
             </Box>
         </FlexBetween>
 
-        {(loginUserId != userId) && isFriend && (
-            <IconButton onClick={toggleFriend}>
-                <PersonRemoveOutlinedIcon sx={{color: primaryLight}}/>
+        <FlexBetween gap='10px'>
+            <IconButton onClick={handleNavigateChat}>
+                <AddCommentIcon sx={{color: primaryDark}}/>
             </IconButton>
-        )}
 
-        {(loginUserId != userId) && !isFriend && (
-            <IconButton onClick={toggleFriend}>
-                <PersonAddOutlinedIcon sx={{color: primaryDark}}/>
-            </IconButton>
-        )}
+            {(loginUserId != userId) && isFriend && (
+                <IconButton onClick={toggleFriend}>
+                    <PersonRemoveOutlinedIcon sx={{color: primaryLight}}/>
+                </IconButton>
+            )}
+
+            {(loginUserId != userId) && !isFriend && (
+                <IconButton onClick={toggleFriend}>
+                    <PersonAddOutlinedIcon sx={{color: primaryDark}}/>
+                </IconButton>
+            )}
+            
+        </FlexBetween>
 
     </FlexBetween>
     );

@@ -6,7 +6,7 @@ import ChatListWidget from 'scenes/widget/ChatListWidget';
 import { useSelector, useDispatch } from "react-redux";
 import { updateChat, updateMessage } from 'state';
 import { socket } from 'socket';
-import { Box, Typography, Avatar, IconButton, InputBase, TextField } from '@mui/material';
+import { Box, Typography, IconButton, InputBase } from '@mui/material';
 import FlexBetween from 'components/Flexbetween';
 import Typing from 'components/Typing';
 import AvatarStatus from 'components/AvatarStatus';
@@ -14,8 +14,8 @@ import VideocamIcon from '@mui/icons-material/Videocam';
 import CallIcon from '@mui/icons-material/Call';
 import SendIcon from '@mui/icons-material/Send';
 
-function ChatPage() {
-    
+function ChatPage({ setIsChat }) {
+
     const { chatId } = useParams();
     
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -26,10 +26,9 @@ function ChatPage() {
     const [isTyping, setIsTyping] = useState(false);
     const currChatIdRef = useRef();
     const messageInputRef = useRef(null);
-
+    
     const token = useSelector((state) => state.authReducer.token);
     const chatList = useSelector((state) => state.chatReducer.chats)
-    const chatIdList = chatList.map((chat) => chat.chatId);
     const messages = useSelector((state) => state.chatReducer.currMessage)
     const loginUserId = useSelector((state) => state.authReducer.user._id);
     const dispatch = useDispatch();
@@ -47,7 +46,7 @@ function ChatPage() {
     const neutralLight = theme.palette.neutral.light;
     const alt = theme.palette.background.alt;
     
-    // fetch Message of the ChatId
+    // fetch Message of the ChatId    
     useEffect(() => {
 
         currChatIdRef.current = chatId;
@@ -76,6 +75,14 @@ function ChatPage() {
         }
     },[chatId])
 
+    useEffect(() => {
+        setIsChat(true);
+
+        return () => {
+            setIsChat(false);
+        }
+    })
+
     // SCROLL SETTINGS
     useEffect(() => {
         if (messageBoxRef.current) {
@@ -90,10 +97,8 @@ function ChatPage() {
 
     // Handle new mewssage received
     useEffect(() => {
-        socket.on('newMessage', (messageObject) => {
-            const chatId = messageObject.chatId;
-            const message = messageObject.message;
-
+        socket.on('newMessage', ({ chatId, message, other }) => {
+            console.log(other);
             // Update the lastest message
             dispatch(updateChat({
                 chatId,
@@ -101,10 +106,13 @@ function ChatPage() {
                     ...message,
                     sender: message.sender._id,
                 },
-                newMessage: loginUserId == message.sender._id ? null : 'increase',
+                newMessage: (loginUserId == message.sender._id) ? null : 'increase',
             }))
 
-            updateNewMessage(chatId, message.sender._id, 'increase')
+            // Update once in sender side
+            if (loginUserId == message.sender._id) {
+                updateNewMessage(chatId, other, 'increase')
+            }
             
             // Update the list of message
             if (chatId == currChatIdRef.current) {
@@ -163,6 +171,7 @@ function ChatPage() {
 
                 socket.emit('newMessage', {
                     chatId: data.newMessage.chatId,
+                    other: currChat.other._id,
                     message: {
                         _id: newMessage._id,
                         createdAt: newMessage.createdAt,
@@ -205,12 +214,13 @@ function ChatPage() {
 
         if (currChat.newMessage != 0) {
             updateNewMessage(chatId, loginUserId, 'reset');
+
+            dispatch(updateChat({
+                chatId,
+                newMessage: 'reset'
+            }))
         }
 
-        dispatch(updateChat({
-            chatId,
-            newMessage: 'reset'
-        }))
 
     }
 

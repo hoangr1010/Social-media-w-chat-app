@@ -9,28 +9,11 @@ import FriendListWidget from 'scenes/widget/FriendListWidget.js';
 
 function HomePage() {
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const avatarSize = 60;
   const isNonMobileScreen = useMediaQuery('(min-width: 1000px)');
   
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.authReducer.user._id);
-  const token = useSelector((state) => state.authReducer.token);
-
-  // Load chat data
-  useEffect(() => {
-    fetch(`${backendUrl}/chat/${userId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      }})
-      .then(response => response.json())
-      .then((data) => {
-        dispatch(setChat(data.chats))
-      })
-      .catch((err) => console.log(err))
-    }, [])
         
   return (
     <Box

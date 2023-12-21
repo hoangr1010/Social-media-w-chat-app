@@ -99,7 +99,10 @@ const chatSlice = createSlice({
                             case 'reset':
                                 chat.newMessage = 0;
                                 break;
+                            case 'null':
+                                break;
                         }
+                        console.log(action.payload.newMessage);
                     }
                 };
                 return chat
