@@ -1,11 +1,10 @@
-import { useEffect } from 'react';
 import { Box, useMediaQuery } from '@mui/material';
 import { useSelector, useDispatch } from "react-redux";
-import { setChat } from 'state';
 import UserWidget from 'scenes/widget/UserWidget.js';
 import MyPostWidget from 'scenes/widget/MyPostWidget.js';
 import PostsWidget from 'scenes/widget/PostsWidget.js';
 import FriendListWidget from 'scenes/widget/FriendListWidget.js';
+import HomeChatListWidget from 'scenes/widget/HomeChatListWidget';
 
 function HomePage() {
 
@@ -26,6 +25,7 @@ function HomePage() {
         isNonMobileScreen && (
         <Box sx={{ flexBasis: '28%' }}>
           <UserWidget userId={userId} avatarSize={avatarSize}/>
+          <HomeChatListWidget />
         </Box>
         )
       }
