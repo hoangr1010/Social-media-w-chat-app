@@ -11,7 +11,9 @@ export const getChat = async (req, res) => {
             .populate({
                 path: 'lastMessage',
                 select: '_id sender message createdAt'
-            });
+            })
+            .sort({ 'lastMessage.createdAt': -1 }); 
+            ;
 
         // create a list of promises that contains promise formatted Chat
         const chatPromises = chats.map(async (chat) => {
