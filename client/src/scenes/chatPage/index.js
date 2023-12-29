@@ -6,7 +6,7 @@ import ChatListWidget from 'scenes/widget/ChatListWidget';
 import { useSelector, useDispatch } from "react-redux";
 import { updateChat, updateMessage } from 'state';
 import { socket } from 'socket';
-import { Box, Typography, IconButton, InputBase } from '@mui/material';
+import { Box, Typography, IconButton, InputBase, useMediaQuery } from '@mui/material';
 import FlexBetween from 'components/Flexbetween';
 import Typing from 'components/Typing';
 import AvatarStatus from 'components/AvatarStatus';
@@ -20,10 +20,12 @@ function ChatPage({ setIsChat }) {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     let currChat, otherPicture, name, status;
     const navigate = useNavigate();
+    const isSmallScreen = useMediaQuery('(max-width:700px)');
     
     const [messageText, setMessageText] = useState('');
-    const messageBoxRef = useRef(null);
     const [isTyping, setIsTyping] = useState(false);
+    const [isDrawer, setIsDrawer] = useState(true);
+    const messageBoxRef = useRef(null);
     const currChatIdRef = useRef();
     const messageInputRef = useRef(null);
     
@@ -45,10 +47,6 @@ function ChatPage({ setIsChat }) {
     const theme = useTheme();
     const neutralLight = theme.palette.neutral.light;
     const alt = theme.palette.background.alt;
-
-    useEffect(() => {
-        // window.location.reload();
-    }, [])
     
     // fetch Message of the ChatId    
     useEffect(() => {
@@ -143,7 +141,6 @@ function ChatPage({ setIsChat }) {
                     setIsTyping(false);
                 }, 1000);
             }
-
         }
 
         socket.on('typing', handleTyping);
@@ -232,8 +229,20 @@ function ChatPage({ setIsChat }) {
     if (chatId == 'null') {
         return (
             <FlexBetween className='page' sx={{ alignItems: 'flex-start' }}>
-                <Box width='350px'>
-                    <ChatListWidget />
+                <Box 
+                    height='100%'
+                    sx={{ 
+                        position: isSmallScreen ? (isDrawer ? 'absolute' : null) : null,
+                        zIndex: 50,
+                        width: isSmallScreen ? (isDrawer ? '100%' : 'auto') : 'auto',
+                    }}
+                >
+                    <ChatListWidget isSmallScreen={isSmallScreen} isDrawer={isDrawer} setIsDrawer={setIsDrawer} />
+                </Box>
+
+                
+                <Box width='100%' height='100%' display='flex' justifyContent='center' alignItems='center'>
+                    <img src='https://upload.wikimedia.org/wikipedia/commons/6/67/Google_Messages_icon_%282022%29.svg'/>
                 </Box>
             </FlexBetween>
 
@@ -244,8 +253,15 @@ function ChatPage({ setIsChat }) {
         <FlexBetween className='page' sx={{ alignItems: 'flex-start' }}>
 
             {/* Search bar and Chat List */}
-            <Box width='350px'>
-                <ChatListWidget />
+            <Box 
+                height='100%'
+                sx={{ 
+                    position: isSmallScreen ? (isDrawer ? 'absolute' : null) : null,
+                    zIndex: 50,
+                    width: isSmallScreen ? (isDrawer ? '100%' : 'auto') : 'auto',
+                }}
+            >
+                <ChatListWidget isSmallScreen={isSmallScreen} isDrawer={isDrawer} setIsDrawer={setIsDrawer} />
             </Box>
 
             {/* Message box */}

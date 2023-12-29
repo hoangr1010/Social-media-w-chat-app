@@ -49,11 +49,9 @@ function ChatWrapper({ children, isChat }) {
         socket.on('connect', () => {
             console.log('socket connected');
 
-            console.log(userRef.current)
             heartBeatInterval = setInterval(() => {
             if (userRef.current) {
                 socket.emit('heartBeat', chatIdList);
-                console.log('heartBeatStart')
             }
             }, 5000);
         })

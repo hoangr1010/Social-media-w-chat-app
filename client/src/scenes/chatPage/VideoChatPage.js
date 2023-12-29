@@ -101,7 +101,6 @@ function VideoChatPage () {
             (err) => {
                 console.error('Failed to get local stream', err);
             }
-
         )
     }
 
@@ -138,7 +137,7 @@ function VideoChatPage () {
         >
 
             <FlexBetween 
-                padding='5% 5% 0px 5%' 
+                padding='2% 2% 0px 2%' 
                 gap='30px'
                 sx={{
                     flexGrow: 1
@@ -161,7 +160,7 @@ function VideoChatPage () {
                                     borderRadius: '5%', 
                                     border: `3px solid ${primaryDark}`,     
                                     backgroundImage: `url('${assetUrl}/user.png')`,
-                                    backgroundSize: '50% ',  // Adjust these values to control the size of the poster
+                                    backgroundSize: '50% ',  
                                     backgroundRepeat: 'no-repeat',
                                     backgroundPosition: 'center',
 
@@ -184,10 +183,9 @@ function VideoChatPage () {
                                     borderRadius: '5%', 
                                     border: `3px solid ${primaryDark}`,     
                                     backgroundImage: `url('${assetUrl}/user.png')`,
-                                    backgroundSize: '50% ',  // Adjust these values to control the size of the poster
+                                    backgroundSize: '50% ',  
                                     backgroundRepeat: 'no-repeat',
                                     backgroundPosition: 'center',
-
                                 }}
                             />
                         </Box>
