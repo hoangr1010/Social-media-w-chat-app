@@ -3,8 +3,9 @@ npm-debug.log
 yarn-error.log
 *.pem
 *.log
+env/
 
-/build
+
 /dist
 /coverage
 /.env.local
