@@ -11,7 +11,7 @@ import LoginNavBar from "scenes/navbar/LoginNavBar.js";
 import ProfilePage from "scenes/profilePage";
 import themeSettings from "theme.js";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import ChatWrapper from "wrappers/ChatWrapper"
+import ChatWrapper from "wrapper/ChatWrapper"
 import CssBaseline from '@mui/material/CssBaseline';
 
 function App() {
