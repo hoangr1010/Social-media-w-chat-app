@@ -22,17 +22,17 @@ function LoginPage() {
         }}
       >
 
-      <Box 
-        width={isNonMobileScreen ? '50%' : '90%'} 
-        backgroundColor={alt}
-        padding='30px 25px'
-        borderRadius='20px'
-      >
-        <Typography fontWeight='bold' fontSize='1.25rem' sx={{pb: '20px'}}>
-          Welcome to Hey!
-        </Typography>
-        <Form />
-      </Box>
+        <Box 
+          width={isNonMobileScreen ? '50%' : '90%'} 
+          backgroundColor={alt}
+          padding='30px 25px'
+          borderRadius='20px'
+        >
+          <Typography fontWeight='bold' fontSize='1.25rem' sx={{pb: '20px'}}>
+            Welcome to Hey!
+          </Typography>
+          <Form />
+        </Box>
       
       </Box>
     );

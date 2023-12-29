@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import HomePage from "scenes/homePage";
 import LoginPage from "scenes/loginPage";
 import ChatPage from "scenes/chatPage";
+import VideoChatPage from "scenes/chatPage/VideoChatPage";
 import Navbar from "scenes/navbar";
 import LoginNavBar from "scenes/navbar/LoginNavBar.js";
 import ProfilePage from "scenes/profilePage";
@@ -29,8 +30,9 @@ function App() {
           <Routes >
             <Route path='/' element={ isUser ? <HomePage /> : <LoginPage /> }/>
             <Route path='/home' element={ isUser ? <HomePage /> : <LoginPage /> }/>
-            <Route path='/chat/:chatId' element = { isUser ? <ChatPage setIsChat={setIsChat}/> : <LoginPage />} />
             <Route path='/profile/:userId' element={ isUser ? <ProfilePage /> : <LoginPage /> }/>
+            <Route path='/chat/:chatId' element = { isUser ? <ChatPage setIsChat={setIsChat}/> : <LoginPage />} />
+            <Route path='/chat/video/:chatId' element = { isUser ? <VideoChatPage /> : <LoginPage />} />
           </Routes>
         </ThemeProvider>
       </ChatWrapper>

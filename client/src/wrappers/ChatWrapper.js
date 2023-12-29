@@ -49,15 +49,17 @@ function ChatWrapper({ children, isChat }) {
         socket.on('connect', () => {
             console.log('socket connected');
 
+            console.log(userRef.current)
             heartBeatInterval = setInterval(() => {
             if (userRef.current) {
                 socket.emit('heartBeat', chatIdList);
+                console.log('heartBeatStart')
             }
             }, 5000);
         })
         } else {      
-        clearInterval(heartBeatInterval);
-        socket.off('connect');
+            clearInterval(heartBeatInterval);
+            socket.off('connect');
         }
 
         // set up socket connection to rooms (chatId)
@@ -67,18 +69,17 @@ function ChatWrapper({ children, isChat }) {
         })
 
         return () => {
-        socket.off('connect');
-        socket.off('chatSetup');
-        clearInterval(heartBeatInterval);
+            socket.off('connect');
+            socket.off('chatSetup');
+            clearInterval(heartBeatInterval);
         }
-    },[user])
+    },[userRef.current])
 
     // HANDLE INCOMING HEARTBEAT
     useEffect(() => {
         let statusTimeout;
 
         const handleStatus = (chatId) => {
-        console.log(chatId);
 
         dispatch(updateChat({chatId: chatId, status: 'online'}));
 

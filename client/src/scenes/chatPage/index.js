@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { setMessage, setCurrChatId } from 'state';
 import { useTheme } from '@mui/material/styles';
 import ChatListWidget from 'scenes/widget/ChatListWidget';
@@ -11,7 +11,6 @@ import FlexBetween from 'components/Flexbetween';
 import Typing from 'components/Typing';
 import AvatarStatus from 'components/AvatarStatus';
 import VideocamIcon from '@mui/icons-material/Videocam';
-import CallIcon from '@mui/icons-material/Call';
 import SendIcon from '@mui/icons-material/Send';
 
 function ChatPage({ setIsChat }) {
@@ -20,6 +19,7 @@ function ChatPage({ setIsChat }) {
     
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     let currChat, otherPicture, name, status;
+    const navigate = useNavigate();
     
     const [messageText, setMessageText] = useState('');
     const messageBoxRef = useRef(null);
@@ -45,6 +45,10 @@ function ChatPage({ setIsChat }) {
     const theme = useTheme();
     const neutralLight = theme.palette.neutral.light;
     const alt = theme.palette.background.alt;
+
+    useEffect(() => {
+        // window.location.reload();
+    }, [])
     
     // fetch Message of the ChatId    
     useEffect(() => {
@@ -269,12 +273,8 @@ function ChatPage({ setIsChat }) {
 
                         <FlexBetween padding='0px 20px' gap='20px'>
 
-                            <IconButton>
+                            <IconButton onClick={() => {navigate(`/chat/video/${chatId}`); navigate(0)}}>
                                 <VideocamIcon color='primary' fontSize='large'/>
-                            </IconButton>
-
-                            <IconButton>
-                                <CallIcon color='primary' fontSize='large'/>
                             </IconButton>
 
                         </FlexBetween>

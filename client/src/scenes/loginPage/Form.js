@@ -140,6 +140,7 @@ function Form() {
                 // Save user and token in redux
                 dispatch(setLogin({user: data.user, token: data.token}));
                 navigate('/home');
+                navigate(0);
             })
             .catch(err => alert(err.message));
 

@@ -7,6 +7,7 @@ import cors from "cors";
 import multer from "multer";
 import helmet from "helmet";
 import morgan from "morgan";
+import { ExpressPeerServer } from 'peer';
 import { Server } from "socket.io";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -72,6 +73,13 @@ await mongoose.connect(mongodbURL, { useNewUrlParser: true, useUnifiedTopology: 
             server = app.listen(process.env.PORT, () => {
                 console.log("listening on port " + process.env.PORT)
             });
+
+            // SETUP PEER SERVER
+            // const peerServer = ExpressPeerServer(server, {
+            //     path: "/myApp",
+            // });
+            // app.use("/peerjs", peerServer);
+                        
         })
         .catch((err) => {
             console.error("Error connecting to MongoDB: ", err);
@@ -114,4 +122,20 @@ io.on('connection', (socket) => {
             socket.in(chatId).emit('heartBeat', chatId);
         })
     })
+
+    // Handle signaling for webrtc
+    socket.on('joinVideoRoom', (chatId, id) => {
+        const videoChatRoomId = `video/${chatId}`
+        socket.join(videoChatRoomId);
+        socket.in(videoChatRoomId).emit('signalling', id);
+    })
+
+    socket.on('leaveVideoRoom', (chatId) => {
+        const videoChatRoomId = `video/${chatId}`
+        socket.leave(videoChatRoomId);
+
+        socket.in(videoChatRoomId).emit('remoteLeaveVideoRoom')
+    })
+
+    
 })
