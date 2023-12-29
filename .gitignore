@@ -1,11 +1,9 @@
-# Node.js
 node_modules/
 npm-debug.log
 yarn-error.log
 *.pem
 *.log
 
-# React
 /build
 /dist
 /coverage
@@ -18,7 +16,6 @@ yarn-error.log
 /.env.test
 /.env.production
 
-# OS generated files
 .DS_Store
 .DS_Store?
 ._*
