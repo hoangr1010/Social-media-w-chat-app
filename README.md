@@ -7,6 +7,8 @@ This project is a social media chat application that allows users to interact th
 - Youtube Demo : <a target="__blanck" href="https://www.youtube.com/watch?v=U0mJ4oAA5t4">Click On Me</a>
 
 ![Image 2023-12-29 at 11 38 PM](https://github.com/hoangr1010/Social-media-w-chat-app/assets/117782458/75750cb0-8813-4786-ab8d-579ccda369d9)
+![Image 2023-12-29 at 11 42 PM](https://github.com/hoangr1010/Social-media-w-chat-app/assets/117782458/b0b409b9-4f4b-4ca8-a6d1-52903ccc3e03)
+
 
 ## Technologies Used
 
